@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block titulo %}Editar operação {{ operacao.id }}{% endblock %}
+
+{% block conteudo %}
+<h1 class="titulo-tela">Editar operação {{ operacao.id }}</h1>
+
+<section class="painel painel-estreito">
+    {# data-sujo impede a atualização automática da página enquanto você edita #}
+    <form method="post" action="{{ url_for('editar', id=operacao.id) }}" class="formulario" data-sujo="true">
+        {% include "_campos_operacao.html" %}
+        <div class="acoes-formulario">
+            <button type="submit" class="botao">Salvar alterações</button>
+            <a class="link-acao" href="{{ url_for('operacao') }}">Cancelar</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

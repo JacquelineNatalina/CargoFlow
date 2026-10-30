@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block titulo %}Operação{% endblock %}
+
+{% block conteudo %}
+<nav class="indicadores" aria-label="Filtrar por status">
+    <a class="indicador {% if not filtro %}ativo{% endif %}" href="{{ url_for('operacao') }}">
+        <strong>{{ total_geral }}</strong>
+        <span>Todas</span>
+    </a>
+    {% for status in status_validos %}
+    <a class="indicador st-{{ status|status_classe }} {% if filtro == status %}ativo{% endif %}"
+       href="{{ url_for('operacao', status=status) }}">
+        <strong>{{ totais[status] }}</strong>
+        <span>{{ status }}</span>
+    </a>
+    {% endfor %}
+</nav>
+
+<div class="duas-colunas">
+    <section class="painel">
+        <h2>Nova operação</h2>
+        <form method="post" action="{{ url_for('cadastrar') }}" class="formulario"
+              {% if form %}data-sujo="true"{% endif %}>
+            {% include "_campos_operacao.html" %}
+            <button type="submit" class="botao">Cadastrar operação</button>
+        </form>
+    </section>
+
+    <section class="painel">
+        <h2>
+            {% if filtro %}{{ filtro }}{% else %}Todas as operações{% endif %}
+            <small>({{ operacoes|length }})</small>
+        </h2>
+
+        {% if operacoes %}
+        <div class="tabela-rolagem">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nº</th>
+                        <th>Motorista</th>
+                        <th>Cavalo / Carreta</th>
+                        <th>Previsto</th>
+                        <th>Status</th>
+                        <th>Carreta</th>
+                        <th>Observações</th>
+                        <th>Atualizado</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for op in operacoes %}
+                    <tr>
+                        <td>{{ op.id }}</td>
+                        <td>
+                            <strong>{{ op.motorista }}</strong><br>
+                            <small>{{ op.cpf|cpf }}</small>
+                        </td>
+                        <td>
+                            <span class="placa-tabela">{{ op.placacavalo }}</span><br>
+                            <span class="placa-tabela">{{ op.placacarreta }}</span>
+                        </td>
+                        <td>
+                            {{ op.dataprevista|data_br }}<br>
+                            <small>{{ op.horarioprevisto }}</small>
+                        </td>
+                        <td>
+                            <span class="selo st-{{ op.status|status_classe }}">{{ op.status }}</span>
+                        </td>
+                        <td class="carga">
+                            <div class="barra" role="progressbar" aria-valuemin="0" aria-valuemax="100"
+                                 aria-valuenow="{{ op.percentual|int }}"
+                                 aria-label="Carregado: {{ op.percentual|int }}%">
+                                <span style="width: {{ op.percentual|int }}%"></span>
+                            </div>
+                            <small>
+                                {{ op.percentual|int }}% da carreta<br>
+                                Qtd {{ op.quantidade|num }}<br>
+                                Peso {{ op.peso|num }}
+                            </small>
+                        </td>
+                        <td class="textos">
+                            {% if op.ocorrencia %}<p class="ocorrencia">{{ op.ocorrencia }}</p>{% endif %}
+                            {% if op.observacao %}<p>{{ op.observacao }}</p>{% endif %}
+                        </td>
+                        <td><small>{{ op.atualizadoem }}</small></td>
+                        <td class="acoes">
+                            <a class="link-acao" href="{{ url_for('editar', id=op.id) }}">Editar</a>
+                            <form method="post" action="{{ url_for('excluir', id=op.id) }}"
+                                  onsubmit="return confirm('Excluir a operação {{ op.id }}? Não é possível desfazer.')">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="link-acao perigo">Excluir</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="vazio">
+            {% if filtro %}Nenhuma operação com status {{ filtro }}.{% else %}Nenhuma operação cadastrada. Preencha o formulário ao lado para criar a primeira.{% endif %}
+        </p>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

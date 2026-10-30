@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block titulo %}Carregamento{% endblock %}
+
+{% block conteudo %}
+<h1 class="titulo-tela">
+    Carregamento
+    <small>{{ operacoes|length }} em andamento</small>
+</h1>
+
+{% if not operacoes %}
+<p class="vazio">
+    Nenhuma operação em andamento. Cadastre uma na tela <a href="{{ url_for('operacao') }}">Operação</a>.
+</p>
+{% endif %}
+
+<section class="cartoes">
+    {% for op in operacoes %}
+    <article class="cartao st-{{ op.status|status_classe }}" id="op-{{ op.id }}">
+        <header class="cartao-topo">
+            <div class="placas">
+                <div>
+                    <span class="rotulo">Cavalo</span>
+                    <h2 class="placa">{{ op.placacavalo }}</h2>
+                </div>
+                <div>
+                    <span class="rotulo">Carreta</span>
+                    <h2 class="placa">{{ op.placacarreta }}</h2>
+                </div>
+            </div>
+            <span class="selo st-{{ op.status|status_classe }}">{{ op.status }}</span>
+        </header>
+
+        <p class="motorista">{{ op.motorista }}</p>
+        <p class="detalhe">CPF {{ op.cpf|cpf }}</p>
+
+        <div class="carga-resumo">
+            <div class="barra grande" role="progressbar" aria-valuemin="0" aria-valuemax="100"
+                 aria-valuenow="{{ op.percentual|int }}"
+                 aria-label="Carreta carregada: {{ op.percentual|int }}%">
+                <span style="width: {{ op.percentual|int }}%"></span>
+            </div>
+            <p><strong>{{ op.percentual|int }}%</strong> da carreta carregada</p>
+        </div>
+        <p class="detalhe">Previsto para {{ op.dataprevista|data_br }} às {{ op.horarioprevisto }}</p>
+        {% if op.observacao %}<p class="obs">{{ op.observacao }}</p>{% endif %}
+
+        <form method="post" action="{{ url_for('atualizar_status', id=op.id) }}" class="formulario">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <fieldset class="chips">
+                <legend>Status</legend>
+                {% for status in status_validos %}
+                <label class="chip st-{{ status|status_classe }}">
+                    <input type="radio" name="status" value="{{ status }}"
+                           {% if status == op.status %}checked{% endif %}>
+                    <span>{{ status }}</span>
+                </label>
+                {% endfor %}
+            </fieldset>
+
+            <div class="campos-carga">
+                <label>Quantidade
+                    <input type="number" name="quantidade" min="0" step="any" inputmode="decimal"
+                           value="{% if op.quantidade %}{{ op.quantidade|float }}{% endif %}">
+                </label>
+                <label>Peso
+                    <input type="number" name="peso" min="0" step="any" inputmode="decimal"
+                           value="{% if op.peso %}{{ op.peso|float }}{% endif %}">
+                </label>
+                <label>% da carreta
+                    <input type="number" name="percentual" min="0" max="100" step="1" inputmode="numeric"
+                           value="{{ op.percentual|int }}">
+                </label>
+            </div>
+
+            <label>Ocorrência
+                <textarea name="ocorrencia" rows="2"
+                          placeholder="Obrigatória para registrar uma pendência">{{ op.ocorrencia or '' }}</textarea>
+            </label>
+
+            <button type="submit" class="botao">Atualizar</button>
+        </form>
+    </article>
+    {% endfor %}
+</section>
+{% endblock %}

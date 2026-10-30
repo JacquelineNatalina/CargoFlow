@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block titulo %}CargoFlow{% endblock %} | CargoFlow</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header class="topo">
+        <span class="marca">CargoFlow</span>
+        {% if session.get('usuario') %}
+        <nav class="abas" aria-label="Telas do sistema">
+            {% if pode_acessar('operacao') %}
+            <a href="{{ url_for('operacao') }}"
+               {% if request.endpoint in ('operacao', 'cadastrar', 'editar', 'excluir') %}aria-current="page"{% endif %}>Operação</a>
+            {% endif %}
+            {% if pode_acessar('carregamento') %}
+            <a href="{{ url_for('carregamento') }}"
+               {% if request.endpoint in ('carregamento', 'atualizar_status') %}aria-current="page"{% endif %}>Carregamento</a>
+            {% endif %}
+        </nav>
+        <div class="usuario">
+            <span>{{ session.get('usuario') }}</span>
+            <form method="post" action="{{ url_for('sair') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="link-acao">Sair</button>
+            </form>
+        </div>
+        {% endif %}
+    </header>
+
+    <main class="pagina">
+        {% with mensagens = get_flashed_messages(with_categories=true) %}
+            {% if mensagens %}
+            <div class="avisos" role="status">
+                {% for categoria, texto in mensagens %}
+                <p class="aviso {{ categoria }}">{{ texto }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block conteudo %}{% endblock %}
+    </main>
+
+    {% if session.get('usuario') %}
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+    {% endif %}
+</body>
+</html>

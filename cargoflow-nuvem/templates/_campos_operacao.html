@@ -1,0 +1,35 @@
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<label>Motorista
+    <input type="text" name="motorista" required autocomplete="off"
+           value="{{ form.get('motorista', '') }}">
+</label>
+<label>CPF do motorista
+    <input type="text" name="cpf" required inputmode="numeric" maxlength="14"
+           placeholder="000.000.000-00" autocomplete="off"
+           value="{{ form.get('cpf', '')|cpf }}">
+</label>
+<div class="linha-dupla">
+    <label>Placa do cavalo
+        <input type="text" name="placacavalo" required maxlength="8"
+               class="placa-campo" placeholder="ABC1D23" autocomplete="off"
+               value="{{ form.get('placacavalo', '') }}">
+    </label>
+    <label>Placa da carreta
+        <input type="text" name="placacarreta" required maxlength="8"
+               class="placa-campo" placeholder="ABC1D23" autocomplete="off"
+               value="{{ form.get('placacarreta', '') }}">
+    </label>
+</div>
+<div class="linha-dupla">
+    <label>Data prevista
+        <input type="date" name="dataprevista" required
+               value="{{ form.get('dataprevista', '') }}">
+    </label>
+    <label>Horário previsto
+        <input type="time" name="horarioprevisto" required
+               value="{{ form.get('horarioprevisto', '') }}">
+    </label>
+</div>
+<label>Observação
+    <textarea name="observacao" rows="3">{{ form.get('observacao', '') or '' }}</textarea>
+</label>

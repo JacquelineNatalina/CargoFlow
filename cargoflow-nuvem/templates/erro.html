@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block titulo %}{{ titulo }}{% endblock %}
+
+{% block conteudo %}
+<section class="painel painel-estreito">
+    <h1>{{ titulo }}</h1>
+    <p class="texto-erro">{{ mensagem }}</p>
+    <p><a class="link-acao" href="{{ url_for('inicio') }}">Voltar ao início</a></p>
+</section>
+{% endblock %}
